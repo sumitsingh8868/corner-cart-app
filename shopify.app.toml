@@ -1,0 +1,30 @@
+name = "corner-cart-app"
+client_id = "YOUR_CLIENT_ID_HERE"
+application_url = "https://your-app.railway.app"
+embedded = true
+
+[build]
+  automatically_update_urls_on_dev = true
+  dev_store_url = "menduherbs.myshopify.com"
+
+[access_scopes]
+  scopes = "read_products,write_products,read_cart_transforms,write_cart_transforms,read_discounts,write_discounts"
+
+[auth]
+  redirect_urls = [
+    "https://your-app.railway.app/auth/callback",
+    "https://your-app.railway.app/auth/shopify/callback",
+    "https://your-app.railway.app/api/auth/callback",
+  ]
+
+[webhooks]
+  api_version = "2025-01"
+  [[webhooks.subscriptions]]
+    topics = ["app/uninstalled"]
+    uri = "/webhooks"
+
+[[extensions]]
+  type = "ui_extension"
+  name = "corner-cart"
+  handle = "corner-cart"
+  path = "extensions/corner-cart"

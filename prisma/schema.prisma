@@ -1,0 +1,88 @@
+// Prisma Schema — Corner Cart App
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// Shopify Sessions
+model Session {
+  id            String    @id
+  shop          String
+  state         String
+  isOnline      Boolean   @default(false)
+  scope         String?
+  expires       DateTime?
+  accessToken   String
+  userId        BigInt?
+  firstName     String?
+  lastName      String?
+  email         String?
+  accountOwner  Boolean   @default(false)
+  locale        String?
+  collaborator  Boolean?  @default(false)
+  emailVerified Boolean?  @default(false)
+}
+
+// Per-store Cart Drawer Settings
+model CartSettings {
+  id        String   @id @default(cuid())
+  shop      String   @unique
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // General
+  enabled         Boolean @default(true)
+
+  // Progress Bar
+  progressEnabled Boolean @default(true)
+  progressGoal    Int     @default(5000)   // in cents
+  progressMessage String  @default("Add {amount} more for FREE shipping!")
+  freeShippingMsg String  @default("🎉 You unlocked FREE shipping!")
+
+  // Checkout Button
+  checkoutBtnText  String @default("Checkout")
+  checkoutBtnColor String @default("#008060")
+  checkoutBtnTextColor String @default("#ffffff")
+
+  // Announcement Bar
+  announcementEnabled Boolean @default(false)
+  announcementText    String  @default("🔥 Free shipping on orders over $50!")
+  announcementBg      String  @default("#008060")
+  announcementColor   String  @default("#ffffff")
+
+  // Discount
+  discountEnabled  Boolean @default(true)
+  discount1Code    String  @default("UPSELL10")
+  discount1Pct     Int     @default(10)
+  discount2Code    String  @default("UPSELL15")
+  discount2Pct     Int     @default(15)
+}
+
+// Upsell Products configured per store
+model UpsellProduct {
+  id        String   @id @default(cuid())
+  shop      String
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  position     Int     @default(0)
+  enabled      Boolean @default(true)
+
+  // Trigger — when this product is in cart, show upsell
+  triggerProductId  String
+  triggerProductTitle String @default("")
+
+  // Upsell — this product to show
+  upsellVariantId   String
+  upsellProductTitle String @default("")
+  upsellProductImage String @default("")
+  upsellPrice        Int    @default(0)  // cents
+  discountPct        Int    @default(10)
+
+  @@index([shop])
+}
